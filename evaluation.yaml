@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eval-deployment
+  namespace: back-ns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: evaluationservice
+  template:
+    metadata:
+      name: evaluation-deployment
+      labels:
+        app: evaluationservice
+    spec:
+      containers:
+        - name: evaluationcontainer
+          image: mtahaelmaghrabi/evaluation:latest
+          resources:
+            limits:
+              memory: "1024Mi"
+              cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: evaluation-cip-svc
+  namespace: back-ns
+spec:
+  type: ClusterIP
+  selector:
+    app: evaluationservice
+  ports:
+  - name: evaluationservice
+    protocol: TCP
+    port: 80
+    targetPort: 80 # the container port
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: evaluation-np-svc
+  namespace: back-ns
+spec:
+  type: NodePort
+  selector:
+    app: evaluationservice
+  ports:
+    - name: evaluationport
+      protocol: TCP
+      port: 80
+      targetPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: evaluation-lb-svc
+  namespace: back-ns
+spec:
+  type: LoadBalancer
+  selector:
+    app: evaluationservice
+  ports:
+    - port: 80
+      targetPort: 80

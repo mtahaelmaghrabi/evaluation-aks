@@ -1,0 +1,37 @@
+# https://docs.microsoft.com/en-us/azure/aks/azure-files-volume
+# create the secret first
+# kubectl create secret generic azure-secret --from-literal=azurestorageaccountname=qppaksfileshare --from-literal=azurestorageaccountkey=imPQKNL56BwvwtL4WZK7IGfuZPQbzG2Rb8dS7i/tcLDTXEYXF0GhrVVdFNlVJO0k5RLAVP+/4fNqdhfkMVAD2A==
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: hr-azurefile
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  azureFile:
+    secretName: azure-secret
+    shareName: aksshare
+    readOnly: false
+  mountOptions:
+  - dir_mode=0777
+  - file_mode=0777
+  - uid=1000
+  - gid=1000
+  - mfsymlinks
+  - nobrl
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: hr-azurefile
+  namespace: front-ns # the namespace should be like the Pod's namespace
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: ""
+  resources:
+    requests:
+      storage: 5Gi

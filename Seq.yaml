@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: seq-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: seq
+  template:
+    metadata:
+      name: seq-deployment
+      labels:
+        app: seq
+    spec:
+      containers:
+        - name: seqcontainer
+          image: datalust/seq:latest
+          ports:
+          - containerPort: 80
+          - containerPort: 5341
+
+          env:
+          - name: "ACCEPT_EULA"
+            value: "Y"
+          resources:
+            limits:
+              memory: "3000Mi"
+              cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: seq-cip-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: seq
+  ports:
+  - name: seqport
+    protocol: TCP
+    port: 5341
+    targetPort: 80 # the container port
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: seq-lb-svc
+spec:
+  type: LoadBalancer
+  selector:
+    app: seq
+  ports:
+    - port: 5341
+      targetPort: 80

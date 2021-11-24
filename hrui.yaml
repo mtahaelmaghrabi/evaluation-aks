@@ -1,0 +1,108 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hrui-deployment
+  namespace: front-ns
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: hruiservice
+  template:
+    metadata:
+      name: hrui-deployment
+      labels:
+        app: hruiservice
+    spec:
+      containers:
+      - name: hruicontainer
+        image: mtahaelmaghrabi/hrmvc:latest
+        env:
+        - name: "ASPNETCORE_ENVIRONMENT"
+          value: "Development"
+        ##(The first probe to run) Once the startup probe succeeds, Kubernetes starts the liveness and readiness probes.
+        startupProbe:
+          httpGet:
+            path: /health/startup ## to test it I have changed the view to be "startup1" then push the image / then fix it an re-push again
+            port: 80
+          failureThreshold: 3  ## How many trial before killing the pod
+          periodSeconds: 10
+
+        ##The liveness probe is what you might expect�it indicates whether the container is alive or not.
+        # if the pod isn't handling requests, it will take approximately 10s (periodSeconds � failureThreshold) before Kubernetes restarts the pod.
+        # types: ( http / command  / TCP )
+        livenessProbe:
+          httpGet:
+            path: /health/dbprobe
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 1   # is how long before a request times out if your application isn't handling requests
+          failureThreshold: 2 # is the number of times a request can fail before the probe is considered "failed"
+
+        ## Readiness probes indicate whether your application is ready to handle requests
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 80
+          successThreshold: 3 # is the number of consecutive times a request must be successful after a failure before the probe is considered successful
+
+        resources:
+          limits:
+            memory: "1024Mi"
+            cpu: "500m"
+        volumeMounts:
+        - mountPath: "app/Logs"
+          name: volume
+      volumes:
+      - name: volume # in case of Dynamic volumes
+        persistentVolumeClaim:
+          claimName: hr-azurefile
+      # - name: volume # in case of Static volumes
+      #   azureFile:
+      #     secretName: azure-secret
+      #     shareName: aksshare
+      #     readOnly: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hrui-cip-srv
+  namespace: front-ns
+spec:
+  type: ClusterIP
+  selector:
+    app: hruiservice
+  ports:
+  - name: hruiport
+    protocol: TCP
+    port: 80
+    targetPort: 80 # the container port
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hrui-np-svc
+  namespace: front-ns
+spec:
+  type: NodePort
+  selector:
+    app: hruiservice
+  ports:
+    - name: hruiport
+      protocol: TCP
+      port: 80
+      targetPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hrui-lb-svc
+  namespace: front-ns
+spec:
+  type: LoadBalancer
+  selector:
+    app: hruiservice
+  ports:
+    - port: 80
+      targetPort: 80
