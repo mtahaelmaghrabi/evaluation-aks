@@ -1,8 +1,9 @@
-kind: StorageClass
 apiVersion: storage.k8s.io/v1
+kind: StorageClass
 metadata:
   name: hr-azurefile
 provisioner: kubernetes.io/azure-file
+#volumeBindingMode: WaitForFirstConsumer
 mountOptions:
   - dir_mode=0777
   - file_mode=0777
