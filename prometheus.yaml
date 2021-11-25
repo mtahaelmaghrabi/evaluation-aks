@@ -1,0 +1,30 @@
+
+# kubectl create namespace monitoring
+
+# helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+# helm repo add stable "https://charts.helm.sh/stable
+# helm repo update
+# helm -n monitoring install prometheus prometheus-community/kube-prometheus-stack
+
+# Check its status by running:
+##  kubectl --namespace monitoring get pods -l "release=prometheus"
+#Visit https://github.com/prometheus-operator/kube-prometheus for instructions on how to create & configure Alertmanager and Prometheus instances using the Operator
+
+# Grafana on port [3000]
+# user = admin
+# password = prom-operator
+# kubectl port-forward deployment.apps/prometheus-grafana 3000
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana-lb-mt-svc
+  namespace: monitoring
+spec:
+  type: LoadBalancer
+  selector:
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/instance: prometheus
+  ports:
+    - port: 80
+      targetPort: 3000

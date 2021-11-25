@@ -1,6 +1,6 @@
 # https://docs.microsoft.com/en-us/azure/aks/azure-files-volume
 # create the secret first
-# kubectl create secret generic azure-secret --from-literal=azurestorageaccountname=qppaksfileshare --from-literal=azurestorageaccountkey=imPQKNL56BwvwtL4WZK7IGfuZPQbzG2Rb8dS7i/tcLDTXEYXF0GhrVVdFNlVJO0k5RLAVP+/4fNqdhfkMVAD2A==
+# kubectl create secret generic azure-secret --from-literal=azurestorageaccountname=qppaksfileshare --from-literal=azurestorageaccountkey=***********************
 
 apiVersion: v1
 kind: PersistentVolume
