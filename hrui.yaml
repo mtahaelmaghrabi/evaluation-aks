@@ -4,7 +4,7 @@ metadata:
   name: hrui-deployment
   namespace: front-ns
 spec:
-  replicas: 2
+  replicas: 8
   selector:
     matchLabels:
       app: hruiservice
@@ -14,6 +14,15 @@ spec:
       labels:
         app: hruiservice
     spec:
+      initContainers:
+      - name: init-ctr # init container > the main container will start only if init-container ends correctly
+        image: busybox
+        command: ['sh', '-c', 
+        'until nslookup hrui-np-svc;
+        do echo waiting for UI-NodePort service; 
+        sleep 1; 
+        done; 
+        echo Service Found!']
       containers:
       - name: hruicontainer
         image: mtahaelmaghrabi/hrmvc:latest
@@ -49,8 +58,8 @@ spec:
 
         resources:
           limits:
-            memory: "1024Mi"
-            cpu: "500m"
+            memory: "512Mi"
+            cpu: "250m"
         volumeMounts:
         - mountPath: "app/Logs"
           name: volume

@@ -4,7 +4,7 @@ metadata:
   name: eval-deployment
   namespace: back-ns
 spec:
-  replicas: 1
+  replicas: 10
   selector:
     matchLabels:
       app: evaluationservice
@@ -19,8 +19,8 @@ spec:
           image: mtahaelmaghrabi/evaluation:latest
           resources:
             limits:
-              memory: "1024Mi"
-              cpu: "500m"
+              memory: "512Mi"
+              cpu: "250m"
 ---
 apiVersion: v1
 kind: Service

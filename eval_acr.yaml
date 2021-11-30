@@ -1,0 +1,38 @@
+#Configure ACR integration for existing AKS clusters
+# az aks update -n AKS-LAB -g AKS-RG --attach-acr pphrcontainers
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eval-acr-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eval-acr-service
+  template:
+    metadata:
+      name: eval-acr-deployment
+      labels:
+        app: eval-acr-service
+    spec:
+      containers:
+        - name: eval-acrcontainer
+          image: pphrcontainers.azurecr.io/hrmvc:latest
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "250m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eval-acr-lb-svc
+spec:
+  type: LoadBalancer
+  selector:
+    app: eval-acr-service
+  ports:
+    - port: 80
+      targetPort: 80

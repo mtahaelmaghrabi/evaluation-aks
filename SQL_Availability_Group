@@ -1,0 +1,7 @@
+kubectl create namespace sql-ns
+kubectl apply -f D:\repos\evaluation-aks\sql\operator.yaml -n sql-ns
+
+kubectl create secret generic sql-secrets --from-literal=sapassword="P@ssw0rd" --from-literal=masterkeypassword="P@ssw0rd" --namespace=ag1
+
+kubectl apply -f D:\repos\evaluation-aks\sql\sqlserver.yaml -n ag1
+
