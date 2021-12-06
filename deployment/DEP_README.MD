@@ -47,9 +47,6 @@ kubectl rollout undo deployment.apps/hr-deployment --to-revision=1
 ### Change the Service's selector to green (imperative)
 kubectl set selector svc [service-name] 'role=green'
 
-kubectl patch service service/blue-lb-svc -p '{"spec":{"selector":{"role": "green"}}}'
-
-
 ### using selector
 kubectl get all --selector role=green
 kubectl get pods --selector role=green
