@@ -23,6 +23,8 @@ kubectl get pods -n front-ns
 
 
 
+ssh -i C:\Users\mohamed\.ssh\redhat101_key.pem mtaha@51.124.249.2
+
 ssh -i C:\Users\mohamed\.ssh\admin_key.pem mtaha@20.101.18.200
 
 ssh -i C:\Users\mohamed\.ssh\master1_key.pem mtaha@20.107.37.217
@@ -120,11 +122,4 @@ STORAGE_KEY=$(az storage account keys list --resource-group AKS-RG --account-nam
 
 echo $STORAGE_KEY
 
-kubectl create secret generic azure-secret --from-literal=azurestorageaccountname=qppaksfileshare --from-literal=azurestorageaccountkey=imPQKNL56BwvwtL4WZK7IGfuZPQbzG2Rb8dS7i/tcLDTXEYXF0GhrVVdFNlVJO0k5RLAVP+/4fNqdhfkMVAD2A==
-
-
-
-
-
-
-
+kubectl create secret generic azure-secret --from-literal=azurestorageaccountname=qppaksfileshare --from-literal=azurestorageaccountkey=**********

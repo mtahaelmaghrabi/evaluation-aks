@@ -4,7 +4,10 @@ metadata:
   name: hrui-deployment
   namespace: front-ns
 spec:
-  replicas: 8
+  replicas: 3
+  #minReadySeconds: 1 # to fix a time before considering the pod healthy
+  #progressDeadlineSeconds: 60 # seconds to wait before reporting stalled deployment
+  #revisionHistoryLimit: 5 # default is (10) > number of repicasets / times that can be rolled back  [History points] [time machine]
   selector:
     matchLabels:
       app: hruiservice
@@ -17,12 +20,7 @@ spec:
       initContainers:
       - name: init-ctr # init container > the main container will start only if init-container ends correctly
         image: busybox
-        command: ['sh', '-c', 
-        'until nslookup hrui-np-svc;
-        do echo waiting for UI-NodePort service; 
-        sleep 1; 
-        done; 
-        echo Service Found!']
+        command: ['sh', '-c', 'until nslookup hrui-np-svc; do echo waiting for UI-NodePort service; sleep 1; done; echo Service Found!']
       containers:
       - name: hruicontainer
         image: mtahaelmaghrabi/hrmvc:latest
@@ -37,8 +35,8 @@ spec:
           failureThreshold: 3  ## How many trial before killing the pod
           periodSeconds: 10
 
-        ##The liveness probe is what you might expect�it indicates whether the container is alive or not.
-        # if the pod isn't handling requests, it will take approximately 10s (periodSeconds � failureThreshold) before Kubernetes restarts the pod.
+        ##The liveness probe is what you might expect, it indicates whether the container is alive or not.
+        # if the pod isn't handling requests, it will take approximately 10s (periodSeconds * failureThreshold) before Kubernetes restarts the pod.
         # types: ( http / command  / TCP )
         livenessProbe:
           httpGet:

@@ -1,0 +1,51 @@
+
+# kubectl config set-context --current --namespace=deployment-lab
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hr-deployment
+  namespace: deployment-lab
+spec:
+  replicas: 4
+  minReadySeconds: 1 # to fix a time before considering the pod healthy
+  progressDeadlineSeconds: 60 # seconds to wait before reporting stalled deployment
+  revisionHistoryLimit: 5 # default is (10) > number of repicasets / times that can be rolled back  [History points] [time machine]
+  selector:
+    matchLabels:
+      app: hr-deploy-lab
+  template:
+    metadata:
+      name: hr-deployment-lab
+      labels:
+        app: hr-deploy-lab
+    spec:
+      containers:
+      - name: hruicontainer
+        image: mtahaelmaghrabi/hrmvc:latest
+        env:
+        - name: "ASPNETCORE_ENVIRONMENT"
+          value: "Development"
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "250m"
+        volumeMounts:
+        - mountPath: "app/Logs"
+          name: volume
+      volumes:
+      - name: volume # in case of Dynamic volumes
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hr-deploy-lb-svc
+  namespace: deployment-lab
+spec:
+  type: LoadBalancer
+  selector:
+    app: hr-deploy-lab
+  ports:
+    - port: 80
+      targetPort: 80

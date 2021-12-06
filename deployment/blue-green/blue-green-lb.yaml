@@ -1,0 +1,30 @@
+# for (Blue) production app
+apiVersion: v1
+kind: Service
+metadata:
+  name: blue-lb-svc
+  namespace: deployment-lab
+spec:
+  type: LoadBalancer
+  selector:
+    app: hr-deploy-lab
+    #role: blue # the only change will be here after getting the approval on Green release
+    role: green
+  ports:
+    - port: 80
+      targetPort: 80
+---
+# for (Green) public testing
+apiVersion: v1
+kind: Service
+metadata:
+  name: green-lb-svc
+  namespace: deployment-lab
+spec:
+  type: LoadBalancer
+  selector:
+    app: hr-deploy-lab
+    role: green
+  ports:
+    - port: 80
+      targetPort: 80
