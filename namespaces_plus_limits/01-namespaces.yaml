@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: back-ns
+  labels:
+    team: back-team
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: front-web-ns
+  labels:
+    team: front-web-team
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: front-mobile-ns
+  labels:
+    team: front-mobile-team

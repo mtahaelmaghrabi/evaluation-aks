@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blue-deployment
+  namespace: helm-ns
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: hr-deploy-lab
+  template:
+    metadata:
+      name: hr-deployment-lab
+      labels:
+        app: hr-deploy-lab
+    spec:
+      containers:
+      - name: hruicontainer
+        image: mtahaelmaghrabi/hrmvc:v7.0
+        env:
+        - name: "ASPNETCORE_ENVIRONMENT"
+          value: "Development"
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "250m"
+        volumeMounts:
+        - mountPath: "app/Logs"
+          name: volume
+      volumes:
+      - name: volume # in case of Dynamic volumes
+        emptyDir: {}

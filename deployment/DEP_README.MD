@@ -1,6 +1,11 @@
 # Deployment strategies
 
-## Rollback deployment ( Default approach )
+## Rollout deployment ( Default approach )
+
+### impertiveXXX
+kubectl deploy --image=nginx --replicas=3
+kubectl set image deployment/deployexxx nginx=nginx:v1
+
 
 To try out the deployment
 - change the replicas & image from the hrui_dep_rolling.yaml

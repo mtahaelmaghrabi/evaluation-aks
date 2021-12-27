@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hr-deploy-lb-svc
+  namespace: helm-ns
+spec:
+  type: LoadBalancer
+  selector:
+    app: hr-deploy-lab
+  ports:
+    - port: 80
+      targetPort: 80

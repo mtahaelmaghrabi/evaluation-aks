@@ -55,6 +55,10 @@ git clone https://github.com/mtahaelmaghrabi/LFD259-LAB.git
 Active namespace
 kubectl config set-context --current --namespace=front-ns
 
+kubectl config set-context --current --namespace=policy-ns
+
+
+
 
 http://localhost:8889/api/Home
 

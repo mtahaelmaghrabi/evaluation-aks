@@ -2,9 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: hrui-deployment
-  namespace: front-ns
+  namespace: front-web-ns
 spec:
-  replicas: 3
+  replicas: 1
   #minReadySeconds: 1 # to fix a time before considering the pod healthy
   #progressDeadlineSeconds: 60 # seconds to wait before reporting stalled deployment
   #revisionHistoryLimit: 5 # default is (10) > number of repicasets / times that can be rolled back  [History points] [time machine]
@@ -18,6 +18,7 @@ spec:
         app: hruiservice
     spec:
       initContainers:
+        # kubectl logs pod101 -c init-ctr -n XXX > to get the init-container logs (c = container)
       - name: init-ctr # init container > the main container will start only if init-container ends correctly
         image: busybox
         command: ['sh', '-c', 'until nslookup hrui-np-svc; do echo waiting for UI-NodePort service; sleep 1; done; echo Service Found!']
@@ -25,8 +26,19 @@ spec:
       - name: hruicontainer
         image: mtahaelmaghrabi/hrmvc:latest
         env:
-        - name: "ASPNETCORE_ENVIRONMENT"
-          value: "Development"
+          - name: ASPNETCORE_ENVIRONMENT
+            valueFrom:
+              configMapKeyRef:
+                name: uiconfigs
+                key: ASPNETCORE_ENVIRONMENT
+          - name: EvaluationApiConnection
+            valueFrom:
+              configMapKeyRef:
+                name: uiconfigs
+                key: EvaluationApiConnection
+        # env:
+        # - name: "ASPNETCORE_ENVIRONMENT"
+        #   value: "Development"
         ##(The first probe to run) Once the startup probe succeeds, Kubernetes starts the liveness and readiness probes.
         startupProbe:
           httpGet:
@@ -55,16 +67,25 @@ spec:
           successThreshold: 3 # is the number of consecutive times a request must be successful after a failure before the probe is considered successful
 
         resources:
+          requests: # Guaranteed to be assigned by k8s schedular
+            memory: "128Mi"
+            cpu: "100m"
           limits:
-            memory: "512Mi"
-            cpu: "250m"
+            memory: "265Mi"
+            cpu: "200m"
         volumeMounts:
-        - mountPath: "app/Logs"
-          name: volume
+          # kubectl create configmap configmapfile --from-file=samplesetting=sample-settings.json -n front-web-ns
+        - name: hrconfigmapfile # mount the configmap as a volume inside the pod
+          mountPath: "app/Config-Sample"
+        - name: volume
+          mountPath: "app/Logs"
       volumes:
       - name: volume # in case of Dynamic volumes
         persistentVolumeClaim:
           claimName: hr-azurefile
+      - name: hrconfigmapfile # define the configmap as a volume
+        configMap:
+          name: configmapfile
       # - name: volume # in case of Static volumes
       #   azureFile:
       #     secretName: azure-secret
@@ -75,7 +96,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: hrui-cip-srv
-  namespace: front-ns
+  namespace: front-web-ns
 spec:
   type: ClusterIP
   selector:
@@ -90,7 +111,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: hrui-np-svc
-  namespace: front-ns
+  namespace: front-web-ns
 spec:
   type: NodePort
   selector:
@@ -105,7 +126,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: hrui-lb-svc
-  namespace: front-ns
+  namespace: front-web-ns
 spec:
   type: LoadBalancer
   selector:

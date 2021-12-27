@@ -1,0 +1,15 @@
+
+#ResourceQuota is for limiting the total resource consumption of a namespace
+
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: hr-quota
+  namespace: back-ns
+spec:
+  hard:
+    pods: 20
+    requests.cpu: 1800m       # The max combind cpu the containers can ask in a namespace
+    requests.memory: 1024Mi
+    limits.cpu: 3000m         # The limit of all containers inside a namespace
+    limits.memory: 4048Mi

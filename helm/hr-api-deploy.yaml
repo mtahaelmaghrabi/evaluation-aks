@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eval-deployment
+  namespace: back-ns
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      app: evaluationservice
+  template:
+    metadata:
+      name: evaluation-deployment
+      labels:
+        app: evaluationservice
+    spec:
+      containers:
+        - name: evaluationcontainer
+          image: mtahaelmaghrabi/evaluation:latest
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "250m"

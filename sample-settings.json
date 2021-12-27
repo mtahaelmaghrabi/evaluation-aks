@@ -1,0 +1,5 @@
+
+{
+  "ASPNETCORE_ENVIRONMENT":  "Development",
+  "EvaluationApiConnection": "http://evaluation-cip-svc.back-ns.svc.cluster.local"
+}

@@ -1,0 +1,30 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: hr-azurefile
+provisioner: kubernetes.io/azure-file
+#volumeBindingMode: WaitForFirstConsumer
+mountOptions:
+  - dir_mode=0777
+  - file_mode=0777
+  - uid=0
+  - gid=0
+  - mfsymlinks
+  - cache=strict
+  - actimeo=30
+parameters:
+  skuName: Standard_LRS
+  shareName: hr-logs
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: hr-azurefile
+  namespace: front-ns # the namespace should be like the Pod's namespace
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: hr-azurefile
+  resources:
+    requests:
+      storage: 5Gi
